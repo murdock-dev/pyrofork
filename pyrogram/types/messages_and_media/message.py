@@ -4773,6 +4773,7 @@ class Message(Object, Update):
         protect_content: bool = None,
         allow_paid_broadcast: bool = None,
         invert_media: bool = None,
+        cover = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -4894,9 +4895,12 @@ class Message(Object, Update):
                 reply_markup=self.reply_markup if reply_markup is object else reply_markup
             )
         elif self.media:
+            if not cover and self.video and self.video.cover:
+                cover = self.video.cover.file_id
             send_media = partial(
                 self._client.send_cached_media,
                 chat_id=chat_id,
+                cover = cover,
                 disable_notification=disable_notification,
                 message_thread_id=message_thread_id,
                 reply_to_message_id=reply_to_message_id,

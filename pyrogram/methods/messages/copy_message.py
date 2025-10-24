@@ -45,6 +45,7 @@ class CopyMessage:
         protect_content: bool = None,
         allow_paid_broadcast: bool = None,
         invert_media: bool = False,
+        cover = None ,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -148,5 +149,6 @@ class CopyMessage:
             protect_content=protect_content,
             allow_paid_broadcast=allow_paid_broadcast,
             invert_media=invert_media,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            cover = cover 
         )
