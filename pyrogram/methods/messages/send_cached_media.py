@@ -21,10 +21,11 @@ from datetime import datetime
 from typing import Union, BinaryIO, List, Optional, Callable
 
 import pyrogram , os , re
-from pyrogram import raw, enums
+from pyrogram import raw, enums , types, utils
 from pyrogram import types
 from pyrogram import utils
-
+from pyrogram.errors import FilePartMissing
+from pyrogram.file_id import FileType
 
 class SendCachedMedia:
     async def send_cached_media(
