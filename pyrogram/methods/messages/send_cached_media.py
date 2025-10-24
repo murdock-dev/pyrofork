@@ -18,7 +18,7 @@
 #  along with Pyrofork.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from typing import Union, List, Optional
+from typing import Union, BinaryIO, List, Optional, Callable
 
 import pyrogram , os
 from pyrogram import raw, enums
