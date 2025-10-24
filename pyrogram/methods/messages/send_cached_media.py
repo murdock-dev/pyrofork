@@ -20,7 +20,7 @@
 from datetime import datetime
 from typing import Union, List, Optional
 
-import pyrogram
+import pyrogram , os
 from pyrogram import raw, enums
 from pyrogram import types
 from pyrogram import utils
@@ -42,6 +42,7 @@ class SendCachedMedia:
         reply_to_chat_id: Union[int, str] = None,
         reply_to_monoforum_id: Union[int, str] = None,
         quote_text: str = None,
+        cover: Union[str, BinaryIO] = None
         quote_entities: List["types.MessageEntity"] = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
@@ -156,11 +157,55 @@ class SendCachedMedia:
             parse_mode=parse_mode
         )
 
-        media = utils.get_input_media_from_file_id(file_id)
-        media.spoiler = has_spoiler
+        vidcover_file = None
+        vidcover_media = None
+        peer = await self.resolve_peer(chat_id)
+
+        try:
+            if cover is not None:
+                if isinstance(cover, str):
+                    if os.path.isfile(cover):
+                        vidcover_media = await self.invoke(
+                            raw.functions.messages.UploadMedia(
+                                peer=peer,
+                                media=raw.types.InputMediaUploadedPhoto(
+                                    file=await self.save_file(cover)
+                                )
+                            )
+                        )
+                    elif re.match("^https?://", cover):
+                        vidcover_media = await self.invoke(
+                            raw.functions.messages.UploadMedia(
+                                peer=peer,
+                                media=raw.types.InputMediaPhotoExternal(
+                                    url=cover
+                                )
+                            )
+                        )
+                    else:
+                        vidcover_file = utils.get_input_media_from_file_id(cover, FileType.PHOTO).id
+                else:
+                    vidcover_media = await self.invoke(
+                        raw.functions.messages.UploadMedia(
+                            peer=peer,
+                            media=raw.types.InputMediaUploadedPhoto(
+                                file=await self.save_file(cover)
+                            )
+                        )
+                    )
+
+                if vidcover_media:
+                    vidcover_file = raw.types.InputPhoto(
+                        id=vidcover_media.photo.id,
+                        access_hash=vidcover_media.photo.access_hash,
+                        file_reference=vidcover_media.photo.file_reference
+                    )
+        except:
+            pass
 
         media = utils.get_input_media_from_file_id(file_id)
         media.spoiler = has_spoiler
+        media.video_cover = vidcover_file
 
         r = await self.invoke(
             raw.functions.messages.SendMedia(
